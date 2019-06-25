@@ -1,17 +1,33 @@
-
+import {querySummoner} from '../services/api';
 export default {
-  state: 'summonedddr',
+  state: {
+    summoners:[]
+  },
   subscriptions: {
     setup({ dispatch, history }) {
+      return history.listen(({ pathname, query }) => {
+        if (pathname === '/summoner') {
+          dispatch({
+            type: 'fetch'
+          })
+        }
+      })
     },
   },
   reducers: {
-    update(state) {
-      return `${state}_summoner`;
+    save(state,action) {
+      return {...state,...action.payload}
     },
   },
   effects: {
     *fetch({ type, payload }, { put, call, select }) {
+      const summonerList = yield call(querySummoner);
+      yield put({
+        type:'save',
+        payload:{
+          summoners:summonerList
+        }
+      })
     },
   },
 }
